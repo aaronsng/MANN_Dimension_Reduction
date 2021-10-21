@@ -18,12 +18,13 @@ def get_images_labels(all_images, nb_classes, nb_samples_per_class, image_size, 
         np.random.shuffle(labels)
     angles = np.random.randint(0, 4, nb_classes) * 90
     images = [image_transform(all_images[sample_classes[i]][np.random.randint(0, len(all_images[sample_classes[i]]))],
-                              angle=angles[i]+(np.random.rand()-0.5)*22.5, trans=np.random.randint(-10, 11, size=2).tolist(), size=image_size)
+                              angle=angles[i]+(np.random.rand()-0.5)*22.5, trans=np.random.randint(-10, 11, size=2).tolist(), size=image_size)   # Random augmentations
               for i in labels]
     return images, labels
 
 def image_transform(image, angle=0., trans=(0.,0.), size=(20, 20)):
-    image = ImageOps.invert(image.convert("L")).rotate(angle, translate=trans).resize(size)
+    image = ImageOps.invert(image.convert("L")).rotate(angle, translate=trans).resize(size)             # Performs random augmentations here. It also downscales the image. This method assumes a monochannel image
+    image.show()
     np_image= np.reshape(np.array(image, dtype=np.float32), newshape=(np.prod(size)))
     max_value = np.max(np_image)
     if max_value > 0.:

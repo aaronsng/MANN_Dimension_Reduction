@@ -15,13 +15,16 @@ def build_argparser():
     parser.add_argument('--restore_training', default=False)
     parser.add_argument('--batch-size',
             dest='_batch_size',	help='Batch size (default: %(default)s)',
-            type=int, default=16)
+            type=int, default=4)
     parser.add_argument('--num-classes',
             dest='_nb_classes', help='Number of classes in each episode (default: %(default)s)',
             type=int, default=5)
     parser.add_argument('--num-samples',
             dest='_nb_samples_per_class', help='Number of taotal samples in each episode (default: %(default)s)',
-            type=int, default=10)
+            type=int, default=2)
+    parser.add_argument('--input-channels', 
+            dest='_input_channels', help='Input image channel (default: %(default)s)',
+            type=int, default=3)
     parser.add_argument('--input-height',
             dest='_input_height', help='Input image height (default: %(default)s)',
             type=int, default=20)
@@ -73,7 +76,6 @@ def metric_accuracy(args, labels, outputs):
             if label[j] == output[j]:
                 correct[class_count[label[j]]] += 1
     return [float(correct[i]) / total[i] if total[i] > 0. else 0. for i in range(1, args._nb_samples_per_class + 1)]
-
 
 def train(model:MANN, data_genarator: OmniglotGenerator, sess, saver, args):
     start_iter = args._start_iterations
@@ -128,14 +130,14 @@ if __name__ == "__main__":
 
     batch_size = args._batch_size
     nb_classes = args._nb_classes
-    nb_samples_per_class = args._nb_samples_per_class
-    img_size = (args._input_height, args._input_width)
-    input_size = args._input_height * args._input_width
+    nb_samples_per_class = args._nb_samples_per_class               
+    img_size = (args._input_height, args._input_width)              # Refers to the input image size. The image_transform method under images.py compresses the mono image to this reduced dimension
+    input_size = args._input_height * args._input_width             # Represents a flattened image.
 
     nb_reads = args._nb_reads
     controller_size = args._controller_size
     memory_size = args._memory_locations
-    memory_dim = args._memory_word_size
+    memory_dim = args._memory_word_size                             # Refers to the memory cell --> How big the word size of it
     num_layers = args._num_layers
 
     learning_rate = args._learning_rate
